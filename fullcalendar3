@@ -1,1 +1,936 @@
-
+  if (!Gt(r, i)) {
+                    n && n(o);
+                    var s = e.apply(this, i);
+                    (t && t(s, o)) || (o = s);
+                }
+            } else o = e.apply(this, i);
+            return (r = i), o;
+        };
+    }
+    function Yt(e, t, n) {
+        var r,
+            o,
+            i = this;
+        return function (a) {
+            if (r) {
+                if (!wt(r, a)) {
+                    n && n(o);
+                    var s = e.call(i, a);
+                    (t && t(s, o)) || (o = s);
+                }
+            } else o = e.call(i, a);
+            return (r = a), o;
+        };
+    }
+    var Zt = { week: 3, separator: 0, omitZeroMinute: 0, meridiem: 0, omitCommas: 0 },
+        Xt = { timeZoneName: 7, era: 6, year: 5, month: 4, day: 2, weekday: 2, hour: 1, minute: 1, second: 1 },
+        Kt = /\s*([ap])\.?m\.?/i,
+        $t = /,/g,
+        Jt = /\s+/g,
+        Qt = /\u200e/g,
+        en = /UTC|GMT/,
+        tn = (function () {
+            function e(e) {
+                var t = {},
+                    n = {},
+                    r = 0;
+                for (var o in e) o in Zt ? ((n[o] = e[o]), (r = Math.max(Zt[o], r))) : ((t[o] = e[o]), o in Xt && (r = Math.max(Xt[o], r)));
+                (this.standardDateProps = t), (this.extendedSettings = n), (this.severity = r), (this.buildFormattingFunc = qt(nn));
+            }
+            return (
+                (e.prototype.format = function (e, t) {
+                    return this.buildFormattingFunc(this.standardDateProps, this.extendedSettings, t)(e);
+                }),
+                (e.prototype.formatRange = function (e, t, n, r) {
+                    var o = this.standardDateProps,
+                        i = this.extendedSettings,
+                        a = (function (e, t, n) {
+                            if (n.getMarkerYear(e) !== n.getMarkerYear(t)) return 5;
+                            if (n.getMarkerMonth(e) !== n.getMarkerMonth(t)) return 4;
+                            if (n.getMarkerDay(e) !== n.getMarkerDay(t)) return 2;
+                            if (gt(e) !== gt(t)) return 1;
+                            return 0;
+                        })(e.marker, t.marker, n.calendarSystem);
+                    if (!a) return this.format(e, n);
+                    var s = a;
+                    !(s > 1) || ("numeric" !== o.year && "2-digit" !== o.year) || ("numeric" !== o.month && "2-digit" !== o.month) || ("numeric" !== o.day && "2-digit" !== o.day) || (s = 1);
+                    var l = this.format(e, n),
+                        u = this.format(t, n);
+                    if (l === u) return l;
+                    var c = nn(
+                            (function (e, t) {
+                                var n = {};
+                                for (var r in e) (!(r in Xt) || Xt[r] <= t) && (n[r] = e[r]);
+                                return n;
+                            })(o, s),
+                            i,
+                            n
+                        ),
+                        d = c(e),
+                        p = c(t),
+                        f = (function (e, t, n, r) {
+                            var o = 0;
+                            for (; o < e.length; ) {
+                                var i = e.indexOf(t, o);
+                                if (-1 === i) break;
+                                var a = e.substr(0, i);
+                                o = i + t.length;
+                                for (var s = e.substr(o), l = 0; l < n.length; ) {
+                                    var u = n.indexOf(r, l);
+                                    if (-1 === u) break;
+                                    var c = n.substr(0, u);
+                                    l = u + r.length;
+                                    var d = n.substr(l);
+                                    if (a === c && s === d) return { before: a, after: s };
+                                }
+                            }
+                            return null;
+                        })(l, d, u, p),
+                        h = i.separator || r || n.defaultSeparator || "";
+                    return f ? f.before + d + h + p + f.after : l + h + u;
+                }),
+                (e.prototype.getLargestUnit = function () {
+                    switch (this.severity) {
+                        case 7:
+                        case 6:
+                        case 5:
+                            return "year";
+                        case 4:
+                            return "month";
+                        case 3:
+                            return "week";
+                        case 2:
+                            return "day";
+                        default:
+                            return "time";
+                    }
+                }),
+                e
+            );
+        })();
+    function nn(e, t, n) {
+        var o = Object.keys(e).length;
+        return 1 === o && "short" === e.timeZoneName
+            ? function (e) {
+                  return jt(e.timeZoneOffset);
+              }
+            : 0 === o && t.week
+            ? function (e) {
+                  return (function (e, t, n, r, o) {
+                      var i = [];
+                      "long" === o ? i.push(n) : ("short" !== o && "narrow" !== o) || i.push(t);
+                      ("long" !== o && "short" !== o) || i.push(" ");
+                      i.push(r.simpleNumberFormat.format(e)), "rtl" === r.options.direction && i.reverse();
+                      return i.join("");
+                  })(n.computeWeekNumber(e.marker), n.weekText, n.weekTextLong, n.locale, t.week);
+              }
+            : (function (e, t, n) {
+                  (e = r({}, e)),
+                      (t = r({}, t)),
+                      (function (e, t) {
+                          e.timeZoneName && (e.hour || (e.hour = "2-digit"), e.minute || (e.minute = "2-digit"));
+                          "long" === e.timeZoneName && (e.timeZoneName = "short");
+                          t.omitZeroMinute && (e.second || e.millisecond) && delete t.omitZeroMinute;
+                      })(e, t),
+                      (e.timeZone = "UTC");
+                  var o,
+                      i = new Intl.DateTimeFormat(n.locale.codes, e);
+                  if (t.omitZeroMinute) {
+                      var a = r({}, e);
+                      delete a.minute, (o = new Intl.DateTimeFormat(n.locale.codes, a));
+                  }
+                  return function (r) {
+                      var a = r.marker;
+                      return (function (e, t, n, r, o) {
+                          (e = e.replace(Qt, "")),
+                              "short" === n.timeZoneName &&
+                                  (e = (function (e, t) {
+                                      var n = !1;
+                                      (e = e.replace(en, function () {
+                                          return (n = !0), t;
+                                      })),
+                                          n || (e += " " + t);
+                                      return e;
+                                  })(e, "UTC" === o.timeZone || null == t.timeZoneOffset ? "UTC" : jt(t.timeZoneOffset)));
+                          r.omitCommas && (e = e.replace($t, "").trim());
+                          r.omitZeroMinute && (e = e.replace(":00", ""));
+                          !1 === r.meridiem
+                              ? (e = e.replace(Kt, "").trim())
+                              : "narrow" === r.meridiem
+                              ? (e = e.replace(Kt, function (e, t) {
+                                    return t.toLocaleLowerCase();
+                                }))
+                              : "short" === r.meridiem
+                              ? (e = e.replace(Kt, function (e, t) {
+                                    return t.toLocaleLowerCase() + "m";
+                                }))
+                              : "lowercase" === r.meridiem &&
+                                (e = e.replace(Kt, function (e) {
+                                    return e.toLocaleLowerCase();
+                                }));
+                          return (e = (e = e.replace(Jt, " ")).trim());
+                      })((o && !a.getUTCMinutes() ? o : i).format(a), r, e, t, n);
+                  };
+              })(e, t, n);
+    }
+    function rn(e, t) {
+        var n = t.markerToArray(e.marker);
+        return { marker: e.marker, timeZoneOffset: e.timeZoneOffset, array: n, year: n[0], month: n[1], day: n[2], hour: n[3], minute: n[4], second: n[5], millisecond: n[6] };
+    }
+    function on(e, t, n, r) {
+        var o = rn(e, n.calendarSystem);
+        return { date: o, start: o, end: t ? rn(t, n.calendarSystem) : null, timeZone: n.timeZone, localeCodes: n.locale.codes, defaultSeparator: r || n.defaultSeparator };
+    }
+    var an = (function () {
+            function e(e) {
+                this.cmdStr = e;
+            }
+            return (
+                (e.prototype.format = function (e, t, n) {
+                    return t.cmdFormatter(this.cmdStr, on(e, null, t, n));
+                }),
+                (e.prototype.formatRange = function (e, t, n, r) {
+                    return n.cmdFormatter(this.cmdStr, on(e, t, n, r));
+                }),
+                e
+            );
+        })(),
+        sn = (function () {
+            function e(e) {
+                this.func = e;
+            }
+            return (
+                (e.prototype.format = function (e, t, n) {
+                    return this.func(on(e, null, t, n));
+                }),
+                (e.prototype.formatRange = function (e, t, n, r) {
+                    return this.func(on(e, t, n, r));
+                }),
+                e
+            );
+        })();
+    function ln(e) {
+        return "object" == typeof e && e ? new tn(e) : "string" == typeof e ? new an(e) : "function" == typeof e ? new sn(e) : null;
+    }
+    var un = {
+            navLinkDayClick: yn,
+            navLinkWeekClick: yn,
+            duration: Nt,
+            bootstrapFontAwesome: yn,
+            buttonIcons: yn,
+            customButtons: yn,
+            defaultAllDayEventDuration: Nt,
+            defaultTimedEventDuration: Nt,
+            nextDayThreshold: Nt,
+            scrollTime: Nt,
+            scrollTimeReset: Boolean,
+            slotMinTime: Nt,
+            slotMaxTime: Nt,
+            dayPopoverFormat: ln,
+            slotDuration: Nt,
+            snapDuration: Nt,
+            headerToolbar: yn,
+            footerToolbar: yn,
+            defaultRangeSeparator: String,
+            titleRangeSeparator: String,
+            forceEventDuration: Boolean,
+            dayHeaders: Boolean,
+            dayHeaderFormat: ln,
+            dayHeaderClassNames: yn,
+            dayHeaderContent: yn,
+            dayHeaderDidMount: yn,
+            dayHeaderWillUnmount: yn,
+            dayCellClassNames: yn,
+            dayCellContent: yn,
+            dayCellDidMount: yn,
+            dayCellWillUnmount: yn,
+            initialView: String,
+            aspectRatio: Number,
+            weekends: Boolean,
+            weekNumberCalculation: yn,
+            weekNumbers: Boolean,
+            weekNumberClassNames: yn,
+            weekNumberContent: yn,
+            weekNumberDidMount: yn,
+            weekNumberWillUnmount: yn,
+            editable: Boolean,
+            viewClassNames: yn,
+            viewDidMount: yn,
+            viewWillUnmount: yn,
+            nowIndicator: Boolean,
+            nowIndicatorClassNames: yn,
+            nowIndicatorContent: yn,
+            nowIndicatorDidMount: yn,
+            nowIndicatorWillUnmount: yn,
+            showNonCurrentDates: Boolean,
+            lazyFetching: Boolean,
+            startParam: String,
+            endParam: String,
+            timeZoneParam: String,
+            timeZone: String,
+            locales: yn,
+            locale: yn,
+            themeSystem: String,
+            dragRevertDuration: Number,
+            dragScroll: Boolean,
+            allDayMaintainDuration: Boolean,
+            unselectAuto: Boolean,
+            dropAccept: yn,
+            eventOrder: je,
+            eventOrderStrict: Boolean,
+            handleWindowResize: Boolean,
+            windowResizeDelay: Number,
+            longPressDelay: Number,
+            eventDragMinDistance: Number,
+            expandRows: Boolean,
+            height: yn,
+            contentHeight: yn,
+            direction: String,
+            weekNumberFormat: ln,
+            eventResizableFromStart: Boolean,
+            displayEventTime: Boolean,
+            displayEventEnd: Boolean,
+            weekText: String,
+            weekTextLong: String,
+            progressiveEventRendering: Boolean,
+            businessHours: yn,
+            initialDate: yn,
+            now: yn,
+            eventDataTransform: yn,
+            stickyHeaderDates: yn,
+            stickyFooterScrollbar: yn,
+            viewHeight: yn,
+            defaultAllDay: Boolean,
+            eventSourceFailure: yn,
+            eventSourceSuccess: yn,
+            eventDisplay: String,
+            eventStartEditable: Boolean,
+            eventDurationEditable: Boolean,
+            eventOverlap: yn,
+            eventConstraint: yn,
+            eventAllow: yn,
+            eventBackgroundColor: String,
+            eventBorderColor: String,
+            eventTextColor: String,
+            eventColor: String,
+            eventClassNames: yn,
+            eventContent: yn,
+            eventDidMount: yn,
+            eventWillUnmount: yn,
+            selectConstraint: yn,
+            selectOverlap: yn,
+            selectAllow: yn,
+            droppable: Boolean,
+            unselectCancel: String,
+            slotLabelFormat: yn,
+            slotLaneClassNames: yn,
+            slotLaneContent: yn,
+            slotLaneDidMount: yn,
+            slotLaneWillUnmount: yn,
+            slotLabelClassNames: yn,
+            slotLabelContent: yn,
+            slotLabelDidMount: yn,
+            slotLabelWillUnmount: yn,
+            dayMaxEvents: yn,
+            dayMaxEventRows: yn,
+            dayMinWidth: Number,
+            slotLabelInterval: Nt,
+            allDayText: String,
+            allDayClassNames: yn,
+            allDayContent: yn,
+            allDayDidMount: yn,
+            allDayWillUnmount: yn,
+            slotMinWidth: Number,
+            navLinks: Boolean,
+            eventTimeFormat: ln,
+            rerenderDelay: Number,
+            moreLinkText: yn,
+            moreLinkHint: yn,
+            selectMinDistance: Number,
+            selectable: Boolean,
+            selectLongPressDelay: Number,
+            eventLongPressDelay: Number,
+            selectMirror: Boolean,
+            eventMaxStack: Number,
+            eventMinHeight: Number,
+            eventMinWidth: Number,
+            eventShortHeight: Number,
+            slotEventOverlap: Boolean,
+            plugins: yn,
+            firstDay: Number,
+            dayCount: Number,
+            dateAlignment: String,
+            dateIncrement: Nt,
+            hiddenDays: yn,
+            monthMode: Boolean,
+            fixedWeekCount: Boolean,
+            validRange: yn,
+            visibleRange: yn,
+            titleFormat: yn,
+            eventInteractive: Boolean,
+            noEventsText: String,
+            viewHint: yn,
+            navLinkHint: yn,
+            closeHint: String,
+            timeHint: String,
+            eventHint: String,
+            moreLinkClick: yn,
+            moreLinkClassNames: yn,
+            moreLinkContent: yn,
+            moreLinkDidMount: yn,
+            moreLinkWillUnmount: yn,
+        },
+        cn = {
+            eventDisplay: "auto",
+            defaultRangeSeparator: " - ",
+            titleRangeSeparator: " â€“ ",
+            defaultTimedEventDuration: "01:00:00",
+            defaultAllDayEventDuration: { day: 1 },
+            forceEventDuration: !1,
+            nextDayThreshold: "00:00:00",
+            dayHeaders: !0,
+            initialView: "",
+            aspectRatio: 1.35,
+            headerToolbar: { start: "title", center: "", end: "today prev,next" },
+            weekends: !0,
+            weekNumbers: !1,
+            weekNumberCalculation: "local",
+            editable: !1,
+            nowIndicator: !1,
+            scrollTime: "06:00:00",
+            scrollTimeReset: !0,
+            slotMinTime: "00:00:00",
+            slotMaxTime: "24:00:00",
+            showNonCurrentDates: !0,
+            lazyFetching: !0,
+            startParam: "start",
+            endParam: "end",
+            timeZoneParam: "timeZone",
+            timeZone: "local",
+            locales: [],
+            locale: "",
+            themeSystem: "standard",
+            dragRevertDuration: 500,
+            dragScroll: !0,
+            allDayMaintainDuration: !1,
+            unselectAuto: !0,
+            dropAccept: "*",
+            eventOrder: "start,-duration,allDay,title",
+            dayPopoverFormat: { month: "long", day: "numeric", year: "numeric" },
+            handleWindowResize: !0,
+            windowResizeDelay: 100,
+            longPressDelay: 1e3,
+            eventDragMinDistance: 5,
+            expandRows: !1,
+            navLinks: !1,
+            selectable: !1,
+            eventMinHeight: 15,
+            eventMinWidth: 30,
+            eventShortHeight: 30,
+        },
+        dn = {
+            datesSet: yn,
+            eventsSet: yn,
+            eventAdd: yn,
+            eventChange: yn,
+            eventRemove: yn,
+            windowResize: yn,
+            eventClick: yn,
+            eventMouseEnter: yn,
+            eventMouseLeave: yn,
+            select: yn,
+            unselect: yn,
+            loading: yn,
+            _unmount: yn,
+            _beforeprint: yn,
+            _afterprint: yn,
+            _noEventDrop: yn,
+            _noEventResize: yn,
+            _resize: yn,
+            _scrollRequest: yn,
+        },
+        pn = { buttonText: yn, buttonHints: yn, views: yn, plugins: yn, initialEvents: yn, events: yn, eventSources: yn },
+        fn = { headerToolbar: hn, footerToolbar: hn, buttonText: hn, buttonHints: hn, buttonIcons: hn };
+    function hn(e, t) {
+        return "object" == typeof e && "object" == typeof t && e && t ? wt(e, t) : e === t;
+    }
+    var vn = { type: String, component: yn, buttonText: String, buttonTextKey: String, dateProfileGeneratorClass: yn, usesMinMaxTime: Boolean, classNames: yn, content: yn, didMount: yn, willUnmount: yn };
+    function gn(e) {
+        return Et(e, fn);
+    }
+    function mn(e, t) {
+        var n = {},
+            r = {};
+        for (var o in t) o in e && (n[o] = t[o](e[o]));
+        for (var o in e) o in t || (r[o] = e[o]);
+        return { refined: n, extra: r };
+    }
+    function yn(e) {
+        return e;
+    }
+    function En(e, t, n, r) {
+        for (var o = { defs: {}, instances: {} }, i = An(n), a = 0, s = e; a < s.length; a++) {
+            var l = Hn(s[a], t, n, r, i);
+            l && Sn(l, o);
+        }
+        return o;
+    }
+    function Sn(e, t) {
+        return void 0 === t && (t = { defs: {}, instances: {} }), (t.defs[e.def.defId] = e.def), e.instance && (t.instances[e.instance.instanceId] = e.instance), t;
+    }
+    function bn(e, t) {
+        var n = e.instances[t];
+        if (n) {
+            var r = e.defs[n.defId],
+                o = wn(e, function (e) {
+                    return (t = r), (n = e), Boolean(t.groupId && t.groupId === n.groupId);
+                    var t, n;
+                });
+            return (o.defs[r.defId] = r), (o.instances[n.instanceId] = n), o;
+        }
+        return { defs: {}, instances: {} };
+    }
+    function Dn() {
+        return { defs: {}, instances: {} };
+    }
+    function Cn(e, t) {
+        return { defs: r(r({}, e.defs), t.defs), instances: r(r({}, e.instances), t.instances) };
+    }
+    function wn(e, t) {
+        var n = St(e.defs, t),
+            r = St(e.instances, function (e) {
+                return n[e.defId];
+            });
+        return { defs: n, instances: r };
+    }
+    function Rn(e) {
+        return Array.isArray(e) ? e : "string" == typeof e ? e.split(/\s+/) : [];
+    }
+    var _n = {
+            display: String,
+            editable: Boolean,
+            startEditable: Boolean,
+            durationEditable: Boolean,
+            constraint: yn,
+            overlap: yn,
+            allow: yn,
+            className: Rn,
+            classNames: Rn,
+            color: String,
+            backgroundColor: String,
+            borderColor: String,
+            textColor: String,
+        },
+        Tn = { display: null, startEditable: null, durationEditable: null, constraints: [], overlap: null, allows: [], backgroundColor: "", borderColor: "", textColor: "", classNames: [] };
+    function kn(e, t) {
+        var n = (function (e, t) {
+            return Array.isArray(e) ? En(e, null, t, !0) : "object" == typeof e && e ? En([e], null, t, !0) : null != e ? String(e) : null;
+        })(e.constraint, t);
+        return {
+            display: e.display || null,
+            startEditable: null != e.startEditable ? e.startEditable : e.editable,
+            durationEditable: null != e.durationEditable ? e.durationEditable : e.editable,
+            constraints: null != n ? [n] : [],
+            overlap: null != e.overlap ? e.overlap : null,
+            allows: null != e.allow ? [e.allow] : [],
+            backgroundColor: e.backgroundColor || e.color || "",
+            borderColor: e.borderColor || e.color || "",
+            textColor: e.textColor || "",
+            classNames: (e.className || []).concat(e.classNames || []),
+        };
+    }
+    function xn(e) {
+        return e.reduce(Mn, Tn);
+    }
+    function Mn(e, t) {
+        return {
+            display: null != t.display ? t.display : e.display,
+            startEditable: null != t.startEditable ? t.startEditable : e.startEditable,
+            durationEditable: null != t.durationEditable ? t.durationEditable : e.durationEditable,
+            constraints: e.constraints.concat(t.constraints),
+            overlap: "boolean" == typeof t.overlap ? t.overlap : e.overlap,
+            allows: e.allows.concat(t.allows),
+            backgroundColor: t.backgroundColor || e.backgroundColor,
+            borderColor: t.borderColor || e.borderColor,
+            textColor: t.textColor || e.textColor,
+            classNames: e.classNames.concat(t.classNames),
+        };
+    }
+    var In = { id: String, groupId: String, title: String, url: String, interactive: Boolean },
+        Pn = { start: yn, end: yn, date: yn, allDay: Boolean },
+        Nn = r(r(r({}, In), Pn), { extendedProps: yn });
+    function Hn(e, t, n, r, o) {
+        void 0 === o && (o = An(n));
+        var i = On(e, n, o),
+            a = i.refined,
+            s = i.extra,
+            l = (function (e, t) {
+                var n = null;
+                e && (n = e.defaultAllDay);
+                null == n && (n = t.options.defaultAllDay);
+                return n;
+            })(t, n),
+            u = (function (e, t, n, r) {
+                for (var o = 0; o < r.length; o += 1) {
+                    var i = r[o].parse(e, n);
+                    if (i) {
+                        var a = e.allDay;
+                        return null == a && null == (a = t) && null == (a = i.allDayGuess) && (a = !1), { allDay: a, duration: i.duration, typeData: i.typeData, typeId: o };
+                    }
+                }
+                return null;
+            })(a, l, n.dateEnv, n.pluginHooks.recurringTypes);
+        if (u) return ((c = Ln(a, s, t ? t.sourceId : "", u.allDay, Boolean(u.duration), n)).recurringDef = { typeId: u.typeId, typeData: u.typeData, duration: u.duration }), { def: c, instance: null };
+        var c,
+            d = (function (e, t, n, r) {
+                var o,
+                    i,
+                    a = e.allDay,
+                    s = null,
+                    l = !1,
+                    u = null,
+                    c = null != e.start ? e.start : e.date;
+                if ((o = n.dateEnv.createMarkerMeta(c))) s = o.marker;
+                else if (!r) return null;
+                null != e.end && (i = n.dateEnv.createMarkerMeta(e.end));
+                null == a && (a = null != t ? t : (!o || o.isTimeUnspecified) && (!i || i.isTimeUnspecified));
+                a && s && (s = lt(s));
+                i && ((u = i.marker), a && (u = lt(u)), s && u <= s && (u = null));
+                u ? (l = !0) : r || ((l = n.options.forceEventDuration || !1), (u = n.dateEnv.add(s, a ? n.options.defaultAllDayEventDuration : n.options.defaultTimedEventDuration)));
+                return { allDay: a, hasEnd: l, range: { start: s, end: u }, forcedStartTzo: o ? o.forcedTzo : null, forcedEndTzo: i ? i.forcedTzo : null };
+            })(a, l, n, r);
+        return d ? { def: (c = Ln(a, s, t ? t.sourceId : "", d.allDay, d.hasEnd, n)), instance: mt(c.defId, d.range, d.forcedStartTzo, d.forcedEndTzo) } : null;
+    }
+    function On(e, t, n) {
+        return void 0 === n && (n = An(t)), mn(e, n);
+    }
+    function An(e) {
+        return r(r(r({}, _n), Nn), e.pluginHooks.eventRefiners);
+    }
+    function Ln(e, t, n, o, i, a) {
+        for (
+            var s = {
+                    title: e.title || "",
+                    groupId: e.groupId || "",
+                    publicId: e.id || "",
+                    url: e.url || "",
+                    recurringDef: null,
+                    defId: Le(),
+                    sourceId: n,
+                    allDay: o,
+                    hasEnd: i,
+                    interactive: e.interactive,
+                    ui: kn(e, a),
+                    extendedProps: r(r({}, e.extendedProps || {}), t),
+                },
+                l = 0,
+                u = a.pluginHooks.eventDefMemberAdders;
+            l < u.length;
+            l++
+        ) {
+            var c = u[l];
+            r(s, c(e));
+        }
+        return Object.freeze(s.ui.classNames), Object.freeze(s.extendedProps), s;
+    }
+    function Un(e) {
+        var t = Math.floor(ot(e.start, e.end)) || 1,
+            n = lt(e.start);
+        return { start: n, end: tt(n, t) };
+    }
+    function Wn(e, t) {
+        void 0 === t && (t = Nt(0));
+        var n = null,
+            r = null;
+        if (e.end) {
+            r = lt(e.end);
+            var o = e.end.valueOf() - r.valueOf();
+            o && o >= Ut(t) && (r = tt(r, 1));
+        }
+        return e.start && ((n = lt(e.start)), r && r <= n && (r = tt(n, 1))), { start: n, end: r };
+    }
+    function Vn(e) {
+        var t = Wn(e);
+        return ot(t.start, t.end) > 1;
+    }
+    function Fn(e, t, n, r) {
+        return "year" === r ? Nt(n.diffWholeYears(e, t), "year") : "month" === r ? Nt(n.diffWholeMonths(e, t), "month") : it(e, t);
+    }
+    function Bn(e, t) {
+        var n,
+            r,
+            o = [],
+            i = t.start;
+        for (e.sort(zn), n = 0; n < e.length; n += 1) (r = e[n]).start > i && o.push({ start: i, end: r.start }), r.end > i && (i = r.end);
+        return i < t.end && o.push({ start: i, end: t.end }), o;
+    }
+    function zn(e, t) {
+        return e.start.valueOf() - t.start.valueOf();
+    }
+    function jn(e, t) {
+        var n = e.start,
+            r = e.end,
+            o = null;
+        return (
+            null !== t.start && (n = null === n ? t.start : new Date(Math.max(n.valueOf(), t.start.valueOf()))),
+            null != t.end && (r = null === r ? t.end : new Date(Math.min(r.valueOf(), t.end.valueOf()))),
+            (null === n || null === r || n < r) && (o = { start: n, end: r }),
+            o
+        );
+    }
+    function Gn(e, t) {
+        return (null === e.start ? null : e.start.valueOf()) === (null === t.start ? null : t.start.valueOf()) && (null === e.end ? null : e.end.valueOf()) === (null === t.end ? null : t.end.valueOf());
+    }
+    function qn(e, t) {
+        return (null === e.end || null === t.start || e.end > t.start) && (null === e.start || null === t.end || e.start < t.end);
+    }
+    function Yn(e, t) {
+        return (null === e.start || (null !== t.start && t.start >= e.start)) && (null === e.end || (null !== t.end && t.end <= e.end));
+    }
+    function Zn(e, t) {
+        return (null === e.start || t >= e.start) && (null === e.end || t < e.end);
+    }
+    function Xn(e, t, n, r) {
+        var o = {},
+            i = {},
+            a = {},
+            s = [],
+            l = [],
+            u = Qn(e.defs, t);
+        for (var c in e.defs) {
+            "inverse-background" === (f = u[(S = e.defs[c]).defId]).display && (S.groupId ? ((o[S.groupId] = []), a[S.groupId] || (a[S.groupId] = S)) : (i[c] = []));
+        }
+        for (var d in e.instances) {
+            var p = e.instances[d],
+                f = u[(S = e.defs[p.defId]).defId],
+                h = p.range,
+                v = !S.allDay && r ? Wn(h, r) : h,
+                g = jn(v, n);
+            g &&
+                ("inverse-background" === f.display
+                    ? S.groupId
+                        ? o[S.groupId].push(g)
+                        : i[p.defId].push(g)
+                    : "none" !== f.display &&
+                      ("background" === f.display ? s : l).push({ def: S, ui: f, instance: p, range: g, isStart: v.start && v.start.valueOf() === g.start.valueOf(), isEnd: v.end && v.end.valueOf() === g.end.valueOf() }));
+        }
+        for (var m in o)
+            for (var y = 0, E = Bn(o[m], n); y < E.length; y++) {
+                var S,
+                    b = E[y];
+                f = u[(S = a[m]).defId];
+                s.push({ def: S, ui: f, instance: null, range: b, isStart: !1, isEnd: !1 });
+            }
+        for (var c in i)
+            for (var D = 0, C = Bn(i[c], n); D < C.length; D++) {
+                b = C[D];
+                s.push({ def: e.defs[c], ui: u[c], instance: null, range: b, isStart: !1, isEnd: !1 });
+            }
+        return { bg: s, fg: l };
+    }
+    function Kn(e) {
+        return "background" === e.ui.display || "inverse-background" === e.ui.display;
+    }
+    function $n(e, t) {
+        e.fcSeg = t;
+    }
+    function Jn(e) {
+        return e.fcSeg || e.parentNode.fcSeg || null;
+    }
+    function Qn(e, t) {
+        return bt(e, function (e) {
+            return er(e, t);
+        });
+    }
+    function er(e, t) {
+        var n = [];
+        return t[""] && n.push(t[""]), t[e.defId] && n.push(t[e.defId]), n.push(e.ui), xn(n);
+    }
+    function tr(e, t) {
+        var n = e.map(nr);
+        return (
+            n.sort(function (e, n) {
+                return Ge(e, n, t);
+            }),
+            n.map(function (e) {
+                return e._seg;
+            })
+        );
+    }
+    function nr(e) {
+        var t = e.eventRange,
+            n = t.def,
+            o = t.instance ? t.instance.range : t.range,
+            i = o.start ? o.start.valueOf() : 0,
+            a = o.end ? o.end.valueOf() : 0;
+        return r(r(r({}, n.extendedProps), n), { id: n.publicId, start: i, end: a, duration: a - i, allDay: Number(n.allDay), _seg: e });
+    }
+    function rr(e, t) {
+        for (var n = t.pluginHooks.isDraggableTransformers, r = e.eventRange, o = r.def, i = r.ui, a = i.startEditable, s = 0, l = n; s < l.length; s++) {
+            a = (0, l[s])(a, o, i, t);
+        }
+        return a;
+    }
+    function or(e, t) {
+        return e.isStart && e.eventRange.ui.durationEditable && t.options.eventResizableFromStart;
+    }
+    function ir(e, t) {
+        return e.isEnd && e.eventRange.ui.durationEditable;
+    }
+    function ar(e, t, n, r, o, i, a) {
+        var s = n.dateEnv,
+            l = n.options,
+            u = l.displayEventTime,
+            c = l.displayEventEnd,
+            d = e.eventRange.def,
+            p = e.eventRange.instance;
+        null == u && (u = !1 !== r), null == c && (c = !1 !== o);
+        var f = p.range.start,
+            h = p.range.end,
+            v = i || e.start || e.eventRange.range.start,
+            g = a || e.end || e.eventRange.range.end,
+            m = lt(f).valueOf() === lt(v).valueOf(),
+            y = lt(nt(h, -1)).valueOf() === lt(nt(g, -1)).valueOf();
+        return u && !d.allDay && (m || y)
+            ? ((v = m ? f : v), (g = y ? h : g), c && d.hasEnd ? s.formatRange(v, g, t, { forcedStartTzo: i ? null : p.forcedStartTzo, forcedEndTzo: a ? null : p.forcedEndTzo }) : s.format(v, t, { forcedTzo: i ? null : p.forcedStartTzo }))
+            : "";
+    }
+    function sr(e, t, n) {
+        var r = e.eventRange.range;
+        return { isPast: r.end < (n || t.start), isFuture: r.start >= (n || t.end), isToday: t && Zn(t, r.start) };
+    }
+    function lr(e) {
+        var t = ["fc-event"];
+        return (
+            e.isMirror && t.push("fc-event-mirror"),
+            e.isDraggable && t.push("fc-event-draggable"),
+            (e.isStartResizable || e.isEndResizable) && t.push("fc-event-resizable"),
+            e.isDragging && t.push("fc-event-dragging"),
+            e.isResizing && t.push("fc-event-resizing"),
+            e.isSelected && t.push("fc-event-selected"),
+            e.isStart && t.push("fc-event-start"),
+            e.isEnd && t.push("fc-event-end"),
+            e.isPast && t.push("fc-event-past"),
+            e.isToday && t.push("fc-event-today"),
+            e.isFuture && t.push("fc-event-future"),
+            t
+        );
+    }
+    function ur(e) {
+        return e.instance ? e.instance.instanceId : e.def.defId + ":" + e.range.start.toISOString();
+    }
+    function cr(e, t) {
+        var n = e.eventRange,
+            r = n.def,
+            o = n.instance,
+            i = r.url;
+        if (i) return { href: i };
+        var a = t.emitter,
+            s = t.options.eventInteractive;
+        return (
+            null == s && null == (s = r.interactive) && (s = Boolean(a.hasHandlers("eventClick"))),
+            s
+                ? Oe(function (e) {
+                      a.trigger("eventClick", { el: e.target, event: new xr(t, r, o), jsEvent: e, view: t.viewApi });
+                  })
+                : {}
+        );
+    }
+    var dr = { start: yn, end: yn, allDay: Boolean };
+    function pr(e, t, n) {
+        var o = (function (e, t) {
+                var n = mn(e, dr),
+                    o = n.refined,
+                    i = n.extra,
+                    a = o.start ? t.createMarkerMeta(o.start) : null,
+                    s = o.end ? t.createMarkerMeta(o.end) : null,
+                    l = o.allDay;
+                null == l && (l = a && a.isTimeUnspecified && (!s || s.isTimeUnspecified));
+                return r({ range: { start: a ? a.marker : null, end: s ? s.marker : null }, allDay: l }, i);
+            })(e, t),
+            i = o.range;
+        if (!i.start) return null;
+        if (!i.end) {
+            if (null == n) return null;
+            i.end = t.add(i.start, n);
+        }
+        return o;
+    }
+    function fr(e, t) {
+        return (
+            Gn(e.range, t.range) &&
+            e.allDay === t.allDay &&
+            (function (e, t) {
+                for (var n in t) if ("range" !== n && "allDay" !== n && e[n] !== t[n]) return !1;
+                for (var n in e) if (!(n in t)) return !1;
+                return !0;
+            })(e, t)
+        );
+    }
+    function hr(e, t, n) {
+        return r(r({}, vr(e, t, n)), { timeZone: t.timeZone });
+    }
+    function vr(e, t, n) {
+        return { start: t.toDate(e.start), end: t.toDate(e.end), startStr: t.formatIso(e.start, { omitTime: n }), endStr: t.formatIso(e.end, { omitTime: n }) };
+    }
+    function gr(e, t, n) {
+        var r = On({ editable: !1 }, n),
+            o = Ln(r.refined, r.extra, "", e.allDay, !0, n);
+        return { def: o, ui: er(o, t), instance: mt(o.defId, e.range), range: e.range, isStart: !0, isEnd: !0 };
+    }
+    function mr(e, t, n) {
+        n.emitter.trigger("select", r(r({}, yr(e, n)), { jsEvent: t ? t.origEvent : null, view: n.viewApi || n.calendarApi.view }));
+    }
+    function yr(e, t) {
+        for (var n, o, i = {}, a = 0, s = t.pluginHooks.dateSpanTransforms; a < s.length; a++) {
+            var l = s[a];
+            r(i, l(e, t));
+        }
+        return r(i, ((n = e), (o = t.dateEnv), r(r({}, vr(n.range, o, n.allDay)), { allDay: n.allDay }))), i;
+    }
+    function Er(e, t, n) {
+        var r = n.dateEnv,
+            o = n.options,
+            i = t;
+        return e ? ((i = lt(i)), (i = r.add(i, o.defaultAllDayEventDuration))) : (i = r.add(i, o.defaultTimedEventDuration)), i;
+    }
+    function Sr(e, t, n, r) {
+        var o = Qn(e.defs, t),
+            i = { defs: {}, instances: {} };
+        for (var a in e.defs) {
+            var s = e.defs[a];
+            i.defs[a] = br(s, o[a], n, r);
+        }
+        for (var l in e.instances) {
+            var u = e.instances[l];
+            s = i.defs[u.defId];
+            i.instances[l] = Dr(u, s, o[u.defId], n, r);
+        }
+        return i;
+    }
+    function br(e, t, n, o) {
+        var i = n.standardProps || {};
+        null == i.hasEnd && t.durationEditable && (n.startDelta || n.endDelta) && (i.hasEnd = !0);
+        var a = r(r(r({}, e), i), { ui: r(r({}, e.ui), i.ui) });
+        n.extendedProps && (a.extendedProps = r(r({}, a.extendedProps), n.extendedProps));
+        for (var s = 0, l = o.pluginHooks.eventDefMutationAppliers; s < l.length; s++) {
+            (0, l[s])(a, n, o);
+        }
+        return !a.hasEnd && o.options.forceEventDuration && (a.hasEnd = !0), a;
+    }
+    function Dr(e, t, n, o, i) {
+        var a = i.dateEnv,
+            s = o.standardProps && !0 === o.standardProps.allDay,
+            l = o.standardProps && !1 === o.standardProps.hasEnd,
+            u = r({}, e);
+        return (
+            s && (u.range = Un(u.range)),
+            o.datesDelta && n.startEditable && (u.range = { start: a.add(u.range.start, o.datesDelta), end: a.add(u.range.end, o.datesDelta) }),
+            o.startDelta && n.durationEditable && (u.range = { start: a.add(u.range.start, o.startDelta), end: u.range.end }),
+            o.endDelta && n.durationEditable && (u.range = { start: u.range.start, end: a.add(u.range.end, o.endDelta) }),
+            l && (u.range = { start: u.range.start, end: Er(t.allDay, u.range.start, i) }),
+            t.allDay && (u.range = { start: lt(u.range.start), end: lt(u.range.end) }),
+            u.range.end < u.range.start && (u.range.end = Er(t.allDay, u.range.start, i)),
+            u
+        );
+    }
