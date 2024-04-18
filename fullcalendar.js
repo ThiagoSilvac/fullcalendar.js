@@ -6806,8 +6806,6 @@ var FullCalendar = (function (e) {
 				}
 				document.addEventListener("mousemove", this.handleMouseMove);
 				document.addEventListener("mouseup", this.handleMouseUp);
-            
-
 			};
 
 			t.prototype.componentWillUnmount = function () {
@@ -7120,8 +7118,6 @@ var FullCalendar = (function (e) {
                             var n = t.createEventFromMouse(e, !0);
                             t.emitter.trigger("pointerdown", n), t.initScrollWatch(n), t.shouldIgnoreMove || document.addEventListener("mousemove", t.handleMouseMove), document.addEventListener("mouseup", t.handleMouseUp);
                         }
-
-
                     }),
                     (this.handleMouseMove = function (e) {
                         var n = t.createEventFromMouse(e);
@@ -7878,6 +7874,21 @@ var FullCalendar = (function (e) {
                     e.isTouch ? r !== o.component.props.eventSelection && t.dispatch({ type: "SELECT_EVENT", eventInstanceId: r }) : t.dispatch({ type: "UNSELECT_EVENT" }),
                         o.isDragging && (t.calendarApi.unselect(e), t.emitter.trigger("eventDragStart", { el: o.subjectEl, event: new xr(t, n.def, n.instance), jsEvent: e.origEvent, view: t.viewApi }));
                 }),
+
+                (o.handleDragStart = function (e) {
+                            var t = o.component.context,
+                                n = o.eventRange,
+                                r = n.instance.instanceId;
+                            
+                            // Chame a função ocultarPopover() quando o arrastar de evento começar
+                            ocultarPopover();
+
+                            e.isTouch ? r !== o.component.props.eventSelection && t.dispatch({ type: "SELECT_EVENT", eventInstanceId: r }) : t.dispatch({ type: "UNSELECT_EVENT" }),
+                                o.isDragging && (t.calendarApi.unselect(e), t.emitter.trigger("eventDragStart", { el: o.subjectEl, event: new xr(t, n.def, n.instance), jsEvent: e.origEvent, view: t.viewApi }));
+                        },
+
+
+
                 (o.handleHitUpdate = function (e, t) {
                     if (o.isDragging) {
                         var n = o.relevantEvents,
@@ -7935,25 +7946,12 @@ var FullCalendar = (function (e) {
                             d = o.relevantEvents,
                             p = o.mutatedRelevantEvents,
                             f = o.hitDragging.finalHit;
-                        //if ((o.clearDrag(), t.emitter.trigger("eventDragStop", { el: o.subjectEl, event: c, jsEvent: e.origEvent, view: n }), s)) {
-                        //    if (a === t) {
-                        //        var h = new xr(t, p.defs[l.defId], u ? p.instances[u.instanceId] : null);
-                        //        t.dispatch({ type: "MERGE_EVENTS", eventStore: p });
-                        //        for (
-                        //            var v = {
                         if ((o.clearDrag(), t.emitter.trigger("eventDragStop", { el: o.subjectEl, event: c, jsEvent: e.origEvent, view: n }), s)) {
-                              if (a === t) {
+                            if (a === t) {
                                 var h = new xr(t, p.defs[l.defId], u ? p.instances[u.instanceId] : null);
                                 t.dispatch({ type: "MERGE_EVENTS", eventStore: p });
-
-                                              // Aqui você pode adicionar a lógica para ocultar o modal
-                                t.hideSidebar(); // Supondo que "hideSidebar" seja o método para ocultar o modal
-                                    // Fim da lógica para ocultar o modal
-
-                                   for (var v = {
-                                    // Continuação do código...
-
-
+                                for (
+                                    var v = {
                                             oldEvent: c,
                                             event: h,
                                             relatedEvents: Ir(p, t, u),
@@ -8164,7 +8162,7 @@ var FullCalendar = (function (e) {
             );
         })(),
         Gs = { fixedMirrorParent: yn },
-        qs = { dateClick: yn, eventDragStart: yn, eventDragStop: true, eventDrop: yn, eventResizeStart: yn, eventResizeStop: yn, eventResize: yn, drop: yn, eventReceive: yn, eventLeave: yn },
+        qs = { dateClick: yn, eventDragStart: yn, eventDragStop: yn, eventDrop: yn, eventResizeStart: yn, eventResizeStop: yn, eventResize: yn, drop: yn, eventReceive: yn, eventLeave: yn },
         Ys = (function () {
             function e(e, t) {
                 var n = this;
@@ -11048,13 +11046,22 @@ var FullCalendar = (function (e) {
         e
     );
 
-function hideSidebar() {
-  var sidebar = document.getElementById('sidebar'); // Supondo que o ID do seu modal seja 'sidebar'
-  if (sidebar) {
-    sidebar.style.display = 'none';
-  }
-}
 
+
+        function ocultarPopover() {
+    // Encontrar todos os elementos com popovers visíveis e escondê-los
+    var popovers = document.querySelectorAll('[data-bs-toggle="popover"]');
+    popovers.forEach(function(popover) {
+        // Verificar se o popover está visível
+        if (popover.getAttribute('data-bs-content') !== null) {
+            // Ocultar o popover
+            var popoverInstance = bootstrap.Popover.getInstance(popover);
+            if (popoverInstance) {
+                popoverInstance.hide();
+            }
+        }
+    });
+}
 
 
 })({});
